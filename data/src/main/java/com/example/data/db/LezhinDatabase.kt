@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [ImageLocal::class], version = 1, exportSchema = false)
+@Database(entities = [LocalImage::class], version = 1, exportSchema = false)
 @TypeConverters(ImageConverter::class)
 abstract class LezhinDatabase : RoomDatabase() {
     abstract fun imageDao(): ImageDao

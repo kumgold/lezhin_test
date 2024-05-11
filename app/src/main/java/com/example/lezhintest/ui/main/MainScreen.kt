@@ -104,10 +104,10 @@ private fun CompactScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(LezhinScreen.Search.route) {
-                SearchScreen(navController = navController)
+                SearchScreen()
             }
             composable(LezhinScreen.Bookmark.route) {
-                BookmarkScreen(navController = navController)
+                BookmarkScreen()
             }
         }
     }
@@ -158,10 +158,10 @@ private fun ExpandedScreen(
             startDestination = LezhinScreen.Search.route
         ) {
             composable(LezhinScreen.Search.route) {
-                SearchScreen(navController = navController)
+                SearchScreen()
             }
             composable(LezhinScreen.Bookmark.route) {
-                BookmarkScreen(navController = navController)
+                BookmarkScreen()
             }
         }
     }

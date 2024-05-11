@@ -1,14 +1,14 @@
 package com.example.data.mapper
 
-import com.example.data.data.ImageResult
-import com.example.data.db.ImageLocal
+import com.example.data.data.NetworkImage
+import com.example.data.db.LocalImage
 
 object ImageMapper {
     fun imageResultToImageLocal(
         keyword: String,
-        result: ImageResult
-    ): ImageLocal {
-        return ImageLocal(
+        result: NetworkImage
+    ): LocalImage {
+        return LocalImage(
             imageUrl = result.imageUrl,
             date = result.dateTime,
             width = result.width,

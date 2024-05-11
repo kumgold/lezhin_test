@@ -35,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.data.db.ImageLocal
+import com.example.data.db.LocalImage
 import com.example.lezhintest.R
 import com.example.lezhintest.ui.compose.CircularLoading
 import com.example.lezhintest.ui.compose.EditActionTitleAppBar
@@ -47,8 +46,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BookmarkScreen(
-    viewModel: BookmarkViewModel = hiltViewModel(),
-    navController: NavController
+    viewModel: BookmarkViewModel = hiltViewModel()
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -63,18 +61,17 @@ fun BookmarkScreen(
             SnackbarHost(hostState = snackBarHostState)
         }
     ) { innerPadding ->
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
             BookmarkScreenHeader(
-                snackBarHostState = snackBarHostState,
                 searchImages = { keyword -> viewModel.searchImages(keyword) },
                 deleteImages = { viewModel.deleteImages() },
-                isEditMode = uiState.isEditMode
+                isEditMode = uiState.isEditMode,
             )
             SavedImageGridView(
                 images = uiState.result,
@@ -82,6 +79,32 @@ fun BookmarkScreen(
                 updateDeleteImages = { id -> viewModel.updateDeleteImages(id) },
                 isLoading = uiState.isLoading
             )
+        }
+
+        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
+
+        LaunchedEffect(uiState.isDeleteImages) {
+            if (uiState.isDeleteImages) {
+                coroutineScope.launch {
+                    snackBarHostState.showSnackbar(
+                        message = ContextCompat.getString(context, R.string.success_delete_images),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+                viewModel.updateEditMode()
+            }
+        }
+
+        LaunchedEffect(uiState.userMessage) {
+            if (uiState.userMessage != null) {
+                coroutineScope.launch {
+                    snackBarHostState.showSnackbar(
+                        message = ContextCompat.getString(context, uiState.userMessage!!),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
         }
     }
 }
@@ -91,26 +114,10 @@ fun BookmarkScreen(
  */
 @Composable
 private fun BookmarkScreenHeader(
-    snackBarHostState: SnackbarHostState,
     searchImages: (String) -> Unit,
     deleteImages: () -> Unit,
-    isEditMode: Boolean
+    isEditMode: Boolean,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val isDelete = remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    LaunchedEffect(isDelete.value) {
-        if (isDelete.value) {
-            coroutineScope.launch {
-                snackBarHostState.showSnackbar(
-                    message = ContextCompat.getString(context, R.string.success_delete_images),
-                    duration = SnackbarDuration.Short
-                )
-            }
-        }
-    }
-
     if (isEditMode) {
         Box(
             modifier = Modifier
@@ -120,7 +127,6 @@ private fun BookmarkScreenHeader(
             TextButton(
                 modifier = Modifier.align(Alignment.CenterEnd),
                 onClick = {
-                    isDelete.value = true
                     deleteImages()
                 }
             ) {
@@ -140,7 +146,7 @@ private fun BookmarkScreenHeader(
  */
 @Composable
 private fun SavedImageGridView(
-    images: List<ImageLocal>,
+    images: List<LocalImage>,
     isEditMode: Boolean,
     updateDeleteImages: (String) -> Unit,
     isLoading: Boolean

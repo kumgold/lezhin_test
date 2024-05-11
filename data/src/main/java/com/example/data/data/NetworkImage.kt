@@ -2,7 +2,7 @@ package com.example.data.data
 
 import com.google.gson.annotations.SerializedName
 
-data class ImageResult(
+data class NetworkImage(
     @SerializedName("collection") val collection: String,
     @SerializedName("thumbnail_url") val thumbnailUrl: String,
     @SerializedName("image_url") val imageUrl: String,

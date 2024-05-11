@@ -15,8 +15,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -26,16 +27,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.example.data.data.ImageResult
+import com.example.data.data.NetworkImage
 import com.example.lezhintest.R
 import com.example.lezhintest.ui.compose.CircularLoading
 import com.example.lezhintest.ui.compose.LezhinDefaultText
@@ -46,10 +45,10 @@ import kotlinx.coroutines.launch
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel = hiltViewModel(),
-    navController: NavController
+    viewModel: SearchViewModel = hiltViewModel()
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { TitleAppBar(titleRes = R.string.search) },
@@ -75,13 +74,27 @@ fun SearchScreen(
                 snackBarHostState = snackBarHostState
             )
         }
+
+        val message = viewModel.userMessage.collectAsState()
+        val context = LocalContext.current
+        LaunchedEffect(message.value) {
+            if (message.value != null) {
+                coroutineScope.launch {
+                    snackBarHostState.showSnackbar(
+                        message = ContextCompat.getString(context, message.value!!),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+                viewModel.clearUserMessage()
+            }
+        }
     }
 }
 
 @Composable
 private fun SearchedImageGridView(
-    images: LazyPagingItems<ImageResult>,
-    insertImage: (ImageResult) -> Unit,
+    images: LazyPagingItems<NetworkImage>,
+    insertImage: (NetworkImage) -> Unit,
     loadState: LoadState,
     snackBarHostState: SnackbarHostState
 ) {
@@ -112,7 +125,7 @@ private fun SearchedImageGridView(
                     items(images.itemCount) { index ->
                         AsyncImage(
                             modifier = Modifier
-                                .height(screenWidth/2)
+                                .height(screenWidth / 2)
                                 .clickable {
                                     coroutineScope.launch {
                                         snackBarHostState.showSnackbar(

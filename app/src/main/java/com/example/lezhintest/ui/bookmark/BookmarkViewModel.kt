@@ -2,8 +2,9 @@ package com.example.lezhintest.ui.bookmark
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.db.ImageLocal
+import com.example.data.db.LocalImage
 import com.example.data.repository.ImageRepository
+import com.example.lezhintest.R
 import com.example.lezhintest.const.Const
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -16,9 +17,10 @@ import javax.inject.Inject
 
 data class BookmarkUiState(
     val isLoading: Boolean = false,
-    val result: List<ImageLocal> = emptyList(),
+    val result: List<LocalImage> = emptyList(),
     val isEditMode: Boolean = false,
-    val isDeleteDone: Boolean = false
+    val isDeleteImages: Boolean = false,
+    val userMessage: Int? = null
 )
 
 @HiltViewModel
@@ -55,7 +57,7 @@ class BookmarkViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isEditMode = !it.isEditMode,
-                isDeleteDone = false
+                isDeleteImages = false
             )
         }
         _images.clear()
@@ -94,9 +96,20 @@ class BookmarkViewModel @Inject constructor(
     fun deleteImages() {
         if (_images.isNotEmpty()) {
             viewModelScope.launch {
-                _uiState.update { it.copy(isDeleteDone = true) }
-                imageRepository.deleteImages(_images)
-                updateEditMode()
+                val deleteImage = imageRepository.deleteImages(_images)
+
+                if (deleteImage.isSuccess) {
+                    _uiState.update {
+                        it.copy(isDeleteImages = deleteImage.isSuccess)
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isDeleteImages = deleteImage.isSuccess,
+                            userMessage = R.string.error_message
+                        )
+                    }
+                }
             }
         }
     }

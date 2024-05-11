@@ -5,12 +5,12 @@ import com.google.gson.Gson
 
 class ImageConverter {
     @TypeConverter
-    fun listToJson(value: List<ImageLocal>): String? {
+    fun listToJson(value: List<LocalImage>): String? {
         return Gson().toJson(value)
     }
 
     @TypeConverter
-    fun jsonToList(value: String): List<ImageLocal>? {
-        return Gson().fromJson(value, Array<ImageLocal>::class.java).toList()
+    fun jsonToList(value: String): List<LocalImage>? {
+        return Gson().fromJson(value, Array<LocalImage>::class.java).toList()
     }
 }
