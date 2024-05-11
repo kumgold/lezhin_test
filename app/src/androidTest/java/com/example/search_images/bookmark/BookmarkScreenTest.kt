@@ -3,6 +3,7 @@ package com.example.search_images.bookmark
 import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -49,11 +50,12 @@ class BookmarkScreenTest {
     fun bookmarkScreen_whenEditButtonClick() {
         setContent()
 
-        composeTestRule.onNodeWithText(activity.getString(R.string.edit)).isDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.search)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.delete)).assertIsNotDisplayed()
         composeTestRule.onNodeWithText(activity.getString(R.string.edit)).performClick()
-        composeTestRule.onNodeWithText(activity.getString(R.string.edit)).isNotDisplayed()
 
-        composeTestRule.onNodeWithText(activity.getString(R.string.delete)).isDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.search)).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(activity.getString(R.string.delete)).assertIsDisplayed()
     }
 
     private fun setContent() {
