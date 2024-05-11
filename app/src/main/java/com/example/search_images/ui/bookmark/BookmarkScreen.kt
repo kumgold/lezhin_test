@@ -1,5 +1,6 @@
 package com.example.search_images.ui.bookmark
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +26,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,8 +43,8 @@ import coil.compose.AsyncImage
 import com.example.data.db.LocalImage
 import com.example.search_images.R
 import com.example.search_images.ui.compose.CircularLoading
-import com.example.search_images.ui.compose.EditActionTitleAppBar
 import com.example.search_images.ui.compose.DefaultText
+import com.example.search_images.ui.compose.EditActionTitleAppBar
 import com.example.search_images.ui.compose.SearchTextField
 import kotlinx.coroutines.launch
 
@@ -76,7 +80,7 @@ fun BookmarkScreen(
             SavedImageGridView(
                 images = uiState.result,
                 isEditMode = uiState.isEditMode,
-                updateDeleteImages = { id -> viewModel.updateDeleteImages(id) },
+                deleteImages = { id -> viewModel.updateDeleteImages(id) },
                 isLoading = uiState.isLoading
             )
         }
@@ -148,7 +152,7 @@ private fun BookmarkScreenHeader(
 private fun SavedImageGridView(
     images: List<LocalImage>,
     isEditMode: Boolean,
-    updateDeleteImages: (String) -> Unit,
+    deleteImages: (String) -> Unit,
     isLoading: Boolean
 ) {
     when (isLoading) {
@@ -172,32 +176,61 @@ private fun SavedImageGridView(
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.default_margin_small))
                 ) {
                     items(images.size) { index ->
-                        Box {
-                            AsyncImage(
-                                modifier = Modifier.height(screenWidth/2),
-                                placeholder = painterResource(id = R.drawable.ic_android_black),
-                                error = painterResource(id = R.drawable.ic_launcher_background),
-                                model = images[index].imageUrl,
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop
-                            )
-
-                            if (isEditMode) {
-                                val isChecked = rememberSaveable { mutableStateOf(false) }
-
-                                Checkbox(
-                                    modifier = Modifier.padding(2.dp),
-                                    checked = isChecked.value,
-                                    onCheckedChange = {
-                                        isChecked.value = !isChecked.value
-                                        updateDeleteImages(images[index].id)
-                                    }
-                                )
-                            }
-                        }
+                        SavedImageItem(
+                            imageHeight = screenWidth/2,
+                            imageUrl = images[index].imageUrl,
+                            imageId = images[index].id,
+                            imageKeyword = images[index].keyword,
+                            isEditMode = isEditMode,
+                            deleteImages = { id -> deleteImages(id) }
+                        )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SavedImageItem(
+    imageHeight: Dp,
+    imageUrl: String,
+    imageId: String,
+    imageKeyword: String,
+    isEditMode: Boolean,
+    deleteImages: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.border(
+            color = Color.Black,
+            width = 1.dp
+        )
+    ) {
+        AsyncImage(
+            modifier = Modifier.height(imageHeight),
+            placeholder = painterResource(id = R.drawable.ic_android_black),
+            error = painterResource(id = R.drawable.ic_launcher_background),
+            model = imageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            text = imageKeyword
+        )
+
+        if (isEditMode) {
+            val isChecked = rememberSaveable { mutableStateOf(false) }
+
+            Checkbox(
+                modifier = Modifier.padding(2.dp),
+                checked = isChecked.value,
+                onCheckedChange = {
+                    isChecked.value = !isChecked.value
+                    deleteImages(imageId)
+                }
+            )
         }
     }
 }

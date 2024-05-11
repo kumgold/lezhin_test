@@ -2,7 +2,22 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="BookmarkScreenTest">
+        <State />
+      </entry>
+      <entry key="SearchScreenTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="bookmarkScreen_whenEditButtonClick()">
+        <State />
+      </entry>
+      <entry key="displayLocalImage()">
+        <State />
+      </entry>
+      <entry key="displaySearchScreen_whenInit()">
         <State />
       </entry>
     </value>
