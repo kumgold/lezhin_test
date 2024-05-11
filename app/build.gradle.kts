@@ -8,17 +8,17 @@ plugins {
 }
 
 android {
-    namespace = "com.example.lezhintest"
+    namespace = "com.example.search_images"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.lezhintest"
+        applicationId = "com.example.search_images"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.example.lezhintest.CustomTestRunner"
+        testInstrumentationRunner = "com.example.search_images.CustomTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }

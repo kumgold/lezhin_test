@@ -15,8 +15,6 @@ class SearchImagesPagingSource(
         return try {
             val page = params.key ?: 1
 
-            throw Exception("test")
-
             val items = api.searchImages(
                 key = BuildConfig.KAKAO_API_KEY,
                 query = query,

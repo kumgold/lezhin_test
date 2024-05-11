@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LezhinTest</string>
+    <string name="app_name">SearchImages</string>
     <string name="search">Search</string>
     <string name="bookmark">Bookmark</string>
     <string name="edit">Edit</string>

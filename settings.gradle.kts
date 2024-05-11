@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LezhinTest"
+rootProject.name = "SearchImages"
 include(":app")
 include(":data")
