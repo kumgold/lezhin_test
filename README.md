@@ -1,4 +1,4 @@
-# Lezhin Test Application
+# Serach images Application
 [라이브러리 목록]<br>
 1. Jetpack Compose : UI<br>
    - Compose는 안드로이드에서 UI를 그리는 새로운 방법입니다. XML로 그리던 방식과 다르게 Kotlin으로 UI를 그릴 수 있습니다.<br>
