@@ -80,9 +80,14 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
-    // Test
+    // Android Test
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.android.compiler)
+
+    // Instrumented Test
+    testImplementation(libs.kotlinx.coroutines.test.jvm)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.hilt.android.testing)
 
     // Coil
     implementation(libs.coil.compose)

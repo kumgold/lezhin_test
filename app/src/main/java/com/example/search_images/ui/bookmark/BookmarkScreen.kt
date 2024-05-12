@@ -1,6 +1,5 @@
 package com.example.search_images.ui.bookmark
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,14 +25,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -180,7 +177,6 @@ private fun SavedImageGridView(
                             imageHeight = screenWidth/2,
                             imageUrl = images[index].imageUrl,
                             imageId = images[index].id,
-                            imageKeyword = images[index].keyword,
                             isEditMode = isEditMode,
                             deleteImages = { id -> deleteImages(id) }
                         )
@@ -196,16 +192,10 @@ private fun SavedImageItem(
     imageHeight: Dp,
     imageUrl: String,
     imageId: String,
-    imageKeyword: String,
     isEditMode: Boolean,
     deleteImages: (String) -> Unit
 ) {
-    Column(
-        modifier = Modifier.border(
-            color = Color.Black,
-            width = 1.dp
-        )
-    ) {
+    Box {
         AsyncImage(
             modifier = Modifier.height(imageHeight),
             placeholder = painterResource(id = R.drawable.ic_android_black),
@@ -213,11 +203,6 @@ private fun SavedImageItem(
             model = imageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop
-        )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            text = imageKeyword
         )
 
         if (isEditMode) {

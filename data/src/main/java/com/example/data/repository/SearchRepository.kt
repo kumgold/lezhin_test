@@ -6,11 +6,16 @@ import androidx.paging.PagingData
 import com.example.data.api.KakaoApiService
 import com.example.data.data.NetworkImage
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class SearchRepository(
+interface SearchRepository {
+    fun searchImages(query: String): Flow<PagingData<NetworkImage>>
+}
+
+class SearchRepositoryImpl @Inject constructor(
     private val searchApiService: KakaoApiService
-) {
-    fun searchImages(query: String): Flow<PagingData<NetworkImage>> {
+) : SearchRepository {
+    override fun searchImages(query: String): Flow<PagingData<NetworkImage>> {
         return Pager(
             PagingConfig(10)
         ) {

@@ -36,7 +36,7 @@ class BookmarkViewModel @Inject constructor(
         getAllImages()
     }
 
-    private fun getAllImages() {
+    fun getAllImages() {
         viewModelScope.launch {
             loading()
             imageRepository.getAllImages().collectLatest { images ->
