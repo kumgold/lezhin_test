@@ -2,6 +2,7 @@ package com.example.data.module
 
 import com.example.data.BuildConfig
 import com.example.data.api.KakaoApiService
+import com.example.data.interceptor.KakaoApiInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +20,7 @@ class NetworkModule {
     fun provideKakaoApiService(): KakaoApiService {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.KAKAO_BASE_URL)
-            .client(OkHttpClient.Builder().build())
+            .client(OkHttpClient.Builder().addInterceptor(KakaoApiInterceptor()).build())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(KakaoApiService::class.java)

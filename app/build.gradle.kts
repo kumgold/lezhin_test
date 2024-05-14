@@ -60,7 +60,7 @@ dependencies {
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
-    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+    implementation(libs.androidx.material3.window.size)
 
     // Flow
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -85,6 +85,7 @@ dependencies {
     kaptAndroidTest(libs.hilt.android.compiler)
 
     // Instrumented Test
+    testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test.jvm)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.hilt.android.testing)

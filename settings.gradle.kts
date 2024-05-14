@@ -22,4 +22,3 @@ dependencyResolutionManagement {
 rootProject.name = "SearchImages"
 include(":app")
 include(":data")
-include(":shared-test")

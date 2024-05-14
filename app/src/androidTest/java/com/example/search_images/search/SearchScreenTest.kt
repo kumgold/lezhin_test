@@ -6,7 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.data.repository.ImageRepositoryImpl
+import com.example.data.repository.ImageRepository
 import com.example.data.repository.SearchRepository
 import com.example.search_images.MainActivity
 import com.example.search_images.R
@@ -36,7 +36,7 @@ class SearchScreenTest {
     lateinit var searchRepository: SearchRepository
 
     @Inject
-    lateinit var imageRepository: ImageRepositoryImpl
+    lateinit var imageRepository: ImageRepository
 
     @Before
     fun init() {

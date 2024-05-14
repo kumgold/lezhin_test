@@ -56,7 +56,7 @@ fun SearchScreen(
         }
     ) { innerPadding ->
 
-        val items = viewModel.image.collectAsLazyPagingItems()
+        val items = viewModel.images.collectAsLazyPagingItems()
 
         Column(
             modifier = Modifier

@@ -12,15 +12,17 @@ class FakeImageDao(
 
     override fun getAllImages(): Flow<List<LocalImage>> {
         return flow {
-            images
+            emit(images)
         }
     }
 
     override fun searchImages(keyword: String): Flow<List<LocalImage>> {
         return flow {
-            images.filter {
-                it.keyword.contains(keyword)
-            }
+            emit(
+                images.filter {
+                    it.keyword.contains(keyword)
+                }
+            )
         }
     }
 
@@ -29,6 +31,8 @@ class FakeImageDao(
     }
 
     override suspend fun deleteImages(list: List<String>) {
-        images.clear()
+        images.removeIf {
+            list.contains(it.id)
+        }
     }
 }

@@ -5,9 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.db.LocalImage
 import com.example.data.repository.ImageRepository
 import com.example.search_images.R
-import com.example.search_images.const.Const
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -27,6 +25,7 @@ data class BookmarkUiState(
 class BookmarkViewModel @Inject constructor(
     private val imageRepository: ImageRepository
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(BookmarkUiState())
     val uiState: StateFlow<BookmarkUiState> = _uiState
 
@@ -36,9 +35,9 @@ class BookmarkViewModel @Inject constructor(
         getAllImages()
     }
 
-    fun getAllImages() {
+    private fun getAllImages() {
+        loading()
         viewModelScope.launch {
-            loading()
             imageRepository.getAllImages().collectLatest { images ->
                 _uiState.update {
                     it.copy(
@@ -75,8 +74,8 @@ class BookmarkViewModel @Inject constructor(
     }
 
     fun searchImages(keyword: String) {
+        loading()
         viewModelScope.launch {
-            loading()
             imageRepository.searchImages(keyword).collectLatest { images ->
                 _uiState.update {
                     it.copy(
@@ -88,9 +87,8 @@ class BookmarkViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loading() {
+    private fun loading() {
         _uiState.update { it.copy(isLoading = true) }
-        delay(Const.LOADING_DELAY_TIME)
     }
 
     fun deleteImages() {

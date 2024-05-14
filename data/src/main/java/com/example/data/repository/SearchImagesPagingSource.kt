@@ -2,7 +2,6 @@ package com.example.data.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.data.BuildConfig
 import com.example.data.api.KakaoApiService
 import com.example.data.data.NetworkImage
 
@@ -16,7 +15,6 @@ class SearchImagesPagingSource(
             val page = params.key ?: 1
 
             val items = api.searchImages(
-                key = BuildConfig.KAKAO_API_KEY,
                 query = query,
                 page = page
             )

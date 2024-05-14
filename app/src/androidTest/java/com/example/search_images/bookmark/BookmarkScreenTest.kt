@@ -42,13 +42,16 @@ class BookmarkScreenTest {
     }
 
     @Test
-    fun bookmarkScreen_whenEditButtonClick() {
+    fun bookmarkScreen_whenEditMode() {
         setContent()
 
+        // Edit Mode : Mode for select and delete images
+        // Before Edit Mode UI
         composeTestRule.onNodeWithText(activity.getString(R.string.search)).assertIsDisplayed()
         composeTestRule.onNodeWithText(activity.getString(R.string.delete)).assertIsNotDisplayed()
         composeTestRule.onNodeWithText(activity.getString(R.string.edit)).performClick()
 
+        // After Edit Mode UI
         composeTestRule.onNodeWithText(activity.getString(R.string.search)).assertIsNotDisplayed()
         composeTestRule.onNodeWithText(activity.getString(R.string.delete)).assertIsDisplayed()
     }

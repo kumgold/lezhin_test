@@ -1,6 +1,5 @@
 package com.example.search_images.ui.search
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -9,9 +8,7 @@ import com.example.data.data.NetworkImage
 import com.example.data.repository.ImageRepository
 import com.example.data.repository.SearchRepository
 import com.example.search_images.R
-import com.example.search_images.const.Const
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -26,12 +23,12 @@ class SearchViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _images = MutableStateFlow<PagingData<NetworkImage>>(PagingData.empty())
-    val image: StateFlow<PagingData<NetworkImage>> = _images
+    val images: StateFlow<PagingData<NetworkImage>> = _images
 
     private val _userMessage = MutableStateFlow<Int?>(null)
     val userMessage: StateFlow<Int?> = _userMessage
 
-    private val keyword = MutableLiveData<String>()
+    private val keyword = MutableStateFlow("")
 
     fun searchImage(query: String) {
         if (query.isEmpty()) return
@@ -39,8 +36,6 @@ class SearchViewModel @Inject constructor(
         keyword.value = query
 
         viewModelScope.launch {
-            delay(Const.LOADING_DELAY_TIME)
-
             searchRepository.searchImages(query)
                 .catch {
                     _userMessage.value = R.string.error_message
@@ -58,7 +53,7 @@ class SearchViewModel @Inject constructor(
     fun insertImage(image: NetworkImage) {
         viewModelScope.launch {
             val insertImage = imageRepository.insertImage(
-                keyword = keyword.value ?: "",
+                keyword = keyword.value,
                 image = image
             )
 
