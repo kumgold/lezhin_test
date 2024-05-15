@@ -19,5 +19,6 @@
 6. Coil : 이미지 라이브러리
 7. Hilt : DI 라이브러리
 8. Room : 로컬 데이터베이스
+9. 기타 : Paging library, Kakao image search api
 
 
