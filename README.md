@@ -12,9 +12,12 @@
    - Flow는 Kotlin 언어 차원에서 지원하는 Reactive Stream 라이브러리 입니다.<br>
    - 클린 아키텍처를 사용할 때, 별도의 Reactive 관련 의존성을 추가하지 않아도 됩니다.<br>
    - 단순히 Cold Flow를 사용할 경우 누수가 발생할 수 있기 때문에 안드로이드에 맞춰 작성된 collectAsStateWithLifecycle()을 사용하는 것이 중요합니다.<br>
-4. Retrofit : 네트워크
-5. Coil : 이미지 라이브러리
-6. Hilt : DI 라이브러리
-7. Room : 로컬 데이터베이스
+4. Test Code 작성
+   - Compose Screen Test
+   - ViewModel Test
+5. Retrofit : 네트워크 라이브러리
+6. Coil : 이미지 라이브러리
+7. Hilt : DI 라이브러리
+8. Room : 로컬 데이터베이스
 
 
