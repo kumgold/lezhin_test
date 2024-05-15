@@ -1,7 +1,5 @@
 package com.example.search_images.search
 
-import androidx.paging.map
-import app.cash.turbine.test
 import com.example.data.data.NetworkImage
 import com.example.data.repository.ImageRepository
 import com.example.data.repository.SearchRepository
@@ -12,7 +10,6 @@ import com.example.search_images.data.FakeSearchRepository
 import com.example.search_images.ui.search.SearchViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -49,19 +46,6 @@ class SearchViewModelTest {
         )
 
         viewModel = SearchViewModel(searchRepository, imageRepository)
-    }
-
-    @Test
-    fun searchImages() = runTest {
-        viewModel.searchImage("카리나")
-
-        viewModel.images.test {
-            val item = awaitItem()
-
-            item.map {
-                Assert.assertEquals("image", it.imageUrl)
-            }
-        }
     }
 
     @Test

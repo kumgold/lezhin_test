@@ -8,12 +8,6 @@
       <entry key="bookmarkScreen_whenEditButtonClick()">
         <State />
       </entry>
-      <entry key="displaySearchScreen_whenInit()">
-        <State />
-      </entry>
-      <entry key="loadAllImagesFromRepository_searchForKeyword()">
-        <State />
-      </entry>
     </value>
   </component>
 </project>
