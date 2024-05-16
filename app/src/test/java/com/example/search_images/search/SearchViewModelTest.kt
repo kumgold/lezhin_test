@@ -1,11 +1,15 @@
 package com.example.search_images.search
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
 import com.example.data.data.NetworkImage
 import com.example.data.repository.ImageRepository
 import com.example.data.repository.SearchRepository
 import com.example.search_images.MainCoroutineRule
 import com.example.search_images.data.FakeImageDao
 import com.example.search_images.data.FakeImageRepository
+import com.example.search_images.data.FakeImagesPagingSource
 import com.example.search_images.data.FakeSearchRepository
 import com.example.search_images.ui.search.SearchViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,26 +30,49 @@ class SearchViewModelTest {
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 
+    private val images = listOf(
+        NetworkImage(
+            width = 100,
+            height = 100,
+            imageUrl = "image url"
+        ),
+        NetworkImage(
+            width = 100,
+            height = 100,
+            imageUrl = "image url"
+        )
+    )
+
     @Before
     fun setup() {
         val fakeImageDao = FakeImageDao()
         imageRepository = FakeImageRepository(fakeImageDao)
-        searchRepository = FakeSearchRepository(
-            listOf(
-                NetworkImage(
-                    width = 100,
-                    height = 100,
-                    imageUrl = "image url"
-                ),
-                NetworkImage(
-                    width = 100,
-                    height = 100,
-                    imageUrl = "image url"
-                )
-            )
-        )
+        searchRepository = FakeSearchRepository(images)
 
         viewModel = SearchViewModel(searchRepository, imageRepository)
+    }
+
+    @Test
+    fun searchImages() = runTest {
+        val pagingSource = FakeImagesPagingSource(images)
+        val params = PagingSource
+            .LoadParams
+            .Append(
+                key = 1,
+                loadSize = 10,
+                placeholdersEnabled = false
+            )
+        val expected = PagingSource
+            .LoadResult
+            .Page(
+                data = images,
+                prevKey = 0,
+                nextKey = 2
+            )
+
+        val data = pagingSource.load(params)
+
+        Assert.assertEquals(expected, data)
     }
 
     @Test
