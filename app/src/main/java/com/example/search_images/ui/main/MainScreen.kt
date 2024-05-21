@@ -3,16 +3,19 @@ package com.example.search_images.ui.main
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,17 +40,20 @@ fun MainScreen(
         AppScreen.Search.route to R.drawable.ic_search,
         AppScreen.Bookmark.route to R.drawable.ic_favorite
     )
+    val snackBarHostState = remember { SnackbarHostState() }
 
     when (windowWidthSizeClass) {
         WindowWidthSizeClass.Compact -> {
             CompactScreen(
                 navController = navController,
+                snackBarHostState = snackBarHostState,
                 icons = icons
             )
         }
         else -> {
             ExpandedScreen(
                 navController = navController,
+                snackBarHostState = snackBarHostState,
                 icons = icons
             )
         }
@@ -58,6 +64,7 @@ fun MainScreen(
 @Composable
 private fun CompactScreen(
     navController: NavHostController,
+    snackBarHostState: SnackbarHostState,
     icons: Map<String, Int>
 ) {
     val items = listOf(
@@ -66,13 +73,14 @@ private fun CompactScreen(
     )
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
 
-            BottomNavigation {
+            BottomAppBar {
                 items.forEach { screen ->
-                    BottomNavigationItem(
+                    NavigationBarItem(
                         icon = {
                             icons[screen.route]?.let { painterResource(id = it) }?.let {
                                 Icon(painter = it, contentDescription = null)
@@ -96,6 +104,9 @@ private fun CompactScreen(
                     )
                 }
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
         }
     ) { innerPadding ->
         NavHost(
@@ -104,10 +115,14 @@ private fun CompactScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(AppScreen.Search.route) {
-                SearchScreen()
+                SearchScreen(
+                    snackBarHostState = snackBarHostState
+                )
             }
             composable(AppScreen.Bookmark.route) {
-                BookmarkScreen()
+                BookmarkScreen(
+                    snackBarHostState = snackBarHostState
+                )
             }
         }
     }
@@ -116,6 +131,7 @@ private fun CompactScreen(
 @Composable
 private fun ExpandedScreen(
     navController: NavHostController,
+    snackBarHostState: SnackbarHostState,
     icons: Map<String, Int>
 ) {
     val items = listOf(
@@ -123,45 +139,59 @@ private fun ExpandedScreen(
         AppScreen.Bookmark
     )
 
-    Row(modifier = Modifier.fillMaxSize()) {
-        NavigationRail {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
-
-            items.forEach { screen ->
-                NavigationRailItem(
-                    icon = {
-                        icons[screen.route]?.let { painterResource(id = it) }?.let {
-                            Icon(painter = it, contentDescription = null)
-                        }
-                    },
-                    label = {
-                        Text(
-                            text = stringResource(id = screen.resourceId)
-                        )
-                    },
-                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                    onClick = {
-                        navController.navigate(screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
-            }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
         }
-        NavHost(
-            navController = navController,
-            startDestination = AppScreen.Search.route
+    ) { paddingValue ->
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValue)
         ) {
-            composable(AppScreen.Search.route) {
-                SearchScreen()
+            NavigationRail {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+
+                items.forEach { screen ->
+                    NavigationRailItem(
+                        icon = {
+                            icons[screen.route]?.let { painterResource(id = it) }?.let {
+                                Icon(painter = it, contentDescription = null)
+                            }
+                        },
+                        label = {
+                            Text(
+                                text = stringResource(id = screen.resourceId)
+                            )
+                        },
+                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
             }
-            composable(AppScreen.Bookmark.route) {
-                BookmarkScreen()
+            NavHost(
+                navController = navController,
+                startDestination = AppScreen.Search.route
+            ) {
+                composable(AppScreen.Search.route) {
+                    SearchScreen(
+                        snackBarHostState = snackBarHostState
+                    )
+                }
+                composable(AppScreen.Bookmark.route) {
+                    BookmarkScreen(
+                        snackBarHostState = snackBarHostState
+                    )
+                }
             }
         }
     }

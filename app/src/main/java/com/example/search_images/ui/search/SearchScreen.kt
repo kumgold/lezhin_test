@@ -10,15 +10,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -44,48 +42,36 @@ import kotlinx.coroutines.launch
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel(),
+    snackBarHostState: SnackbarHostState
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
+    val items = viewModel.images.collectAsLazyPagingItems()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(
-        topBar = { TitleAppBar(titleRes = R.string.search) },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
+    Column {
+        TitleAppBar(titleRes = R.string.search)
+        SearchTextField { query ->
+            viewModel.searchImage(query)
         }
-    ) { innerPadding ->
+        SearchedImageGridView(
+            images = items,
+            insertImage = { image -> viewModel.insertImage(image) },
+            loadState = items.loadState.refresh,
+            snackBarHostState = snackBarHostState
+        )
+    }
 
-        val items = viewModel.images.collectAsLazyPagingItems()
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            SearchTextField { query ->
-                viewModel.searchImage(query)
+    val message = viewModel.userMessage.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(message.value) {
+        if (message.value != null) {
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(
+                    message = ContextCompat.getString(context, message.value!!),
+                    duration = SnackbarDuration.Short
+                )
             }
-            SearchedImageGridView(
-                images = items,
-                insertImage = { image -> viewModel.insertImage(image) },
-                loadState = items.loadState.refresh,
-                snackBarHostState = snackBarHostState
-            )
-        }
-
-        val message = viewModel.userMessage.collectAsState()
-        val context = LocalContext.current
-        LaunchedEffect(message.value) {
-            if (message.value != null) {
-                coroutineScope.launch {
-                    snackBarHostState.showSnackbar(
-                        message = ContextCompat.getString(context, message.value!!),
-                        duration = SnackbarDuration.Short
-                    )
-                }
-                viewModel.clearUserMessage()
-            }
+            viewModel.clearUserMessage()
         }
     }
 }
@@ -121,7 +107,7 @@ private fun SearchedImageGridView(
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.default_margin_small)),
                     state = rememberLazyGridState(initialFirstVisibleItemScrollOffset = 0)
                 ) {
-                    items(images.itemCount) { index ->
+                    items(images.itemSnapshotList) { image ->
                         AsyncImage(
                             modifier = Modifier
                                 .height(screenWidth / 2)
@@ -135,11 +121,11 @@ private fun SearchedImageGridView(
                                             duration = SnackbarDuration.Short
                                         )
                                     }
-                                    images[index]?.let { insertImage(it) }
+                                    image?.let { insertImage(it) }
                                 },
                             placeholder = painterResource(id = R.drawable.ic_android_black),
                             error = painterResource(id = R.drawable.ic_launcher_background),
-                            model = images[index]?.imageUrl,
+                            model = image?.imageUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop
                         )

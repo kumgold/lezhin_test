@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -47,64 +45,51 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BookmarkScreen(
-    viewModel: BookmarkViewModel = hiltViewModel()
+    viewModel: BookmarkViewModel = hiltViewModel(),
+    snackBarHostState: SnackbarHostState
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            EditActionTitleAppBar(
-                titleRes = R.string.bookmark,
-                updateEditMode = { viewModel.updateEditMode() }
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        }
-    ) { innerPadding ->
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    Column {
+        EditActionTitleAppBar(
+            titleRes = R.string.bookmark,
+            updateEditMode = { viewModel.updateEditMode() }
+        )
+        BookmarkScreenHeader(
+            searchImages = { keyword -> viewModel.searchImages(keyword) },
+            deleteImages = { viewModel.deleteImages() },
+            isEditMode = uiState.isEditMode,
+        )
+        SavedImageGridView(
+            images = uiState.result,
+            isEditMode = uiState.isEditMode,
+            deleteImages = { id -> viewModel.updateDeleteImages(id) },
+            isLoading = uiState.isLoading
+        )
+    }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            BookmarkScreenHeader(
-                searchImages = { keyword -> viewModel.searchImages(keyword) },
-                deleteImages = { viewModel.deleteImages() },
-                isEditMode = uiState.isEditMode,
-            )
-            SavedImageGridView(
-                images = uiState.result,
-                isEditMode = uiState.isEditMode,
-                deleteImages = { id -> viewModel.updateDeleteImages(id) },
-                isLoading = uiState.isLoading
-            )
-        }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-        val coroutineScope = rememberCoroutineScope()
-        val context = LocalContext.current
-
-        LaunchedEffect(uiState.isDeleteImages) {
-            if (uiState.isDeleteImages) {
-                coroutineScope.launch {
-                    snackBarHostState.showSnackbar(
-                        message = ContextCompat.getString(context, R.string.success_delete_images),
-                        duration = SnackbarDuration.Short
-                    )
-                }
-                viewModel.updateEditMode()
+    LaunchedEffect(uiState.isDeleteImages) {
+        if (uiState.isDeleteImages) {
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(
+                    message = ContextCompat.getString(context, R.string.success_delete_images),
+                    duration = SnackbarDuration.Short
+                )
             }
+            viewModel.updateEditMode()
         }
+    }
 
-        LaunchedEffect(uiState.userMessage) {
-            if (uiState.userMessage != null) {
-                coroutineScope.launch {
-                    snackBarHostState.showSnackbar(
-                        message = ContextCompat.getString(context, uiState.userMessage!!),
-                        duration = SnackbarDuration.Short
-                    )
-                }
+    LaunchedEffect(uiState.userMessage) {
+        if (uiState.userMessage != null) {
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(
+                    message = ContextCompat.getString(context, uiState.userMessage!!),
+                    duration = SnackbarDuration.Short
+                )
             }
         }
     }
@@ -172,11 +157,11 @@ private fun SavedImageGridView(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.default_margin_small)),
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.default_margin_small))
                 ) {
-                    items(images.size) { index ->
+                    items(images) { image ->
                         SavedImageItem(
                             imageHeight = screenWidth/2,
-                            imageUrl = images[index].imageUrl,
-                            imageId = images[index].id,
+                            imageUrl = image.imageUrl,
+                            imageId = image.id,
                             isEditMode = isEditMode,
                             deleteImages = { id -> deleteImages(id) }
                         )
