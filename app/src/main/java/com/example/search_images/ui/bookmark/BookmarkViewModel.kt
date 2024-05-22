@@ -29,7 +29,7 @@ class BookmarkViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BookmarkUiState())
     val uiState: StateFlow<BookmarkUiState> = _uiState
 
-    private val _images = mutableListOf<String>()
+    private val _deleteImageIdList = MutableStateFlow<MutableList<String>>(mutableListOf())
 
     init {
         getAllImages()
@@ -59,17 +59,31 @@ class BookmarkViewModel @Inject constructor(
                 isDeleteImages = false
             )
         }
-        _images.clear()
+        clearDeleteImageIdList()
+    }
+
+    fun stopEditMode() {
+        _uiState.update {
+            it.copy(
+                isEditMode = false,
+                isDeleteImages = false
+            )
+        }
+        clearDeleteImageIdList()
+    }
+
+    private fun clearDeleteImageIdList() {
+        _deleteImageIdList.value.clear()
     }
 
     /**
      * 삭제를 위해 체크박스가 선택된 이미지를 추가하거나, 체크박스가 해제된 이미지를 제거한다.
      */
     fun updateDeleteImages(id: String) {
-        if (_images.contains(id)) {
-            _images.remove(id)
+        if (_deleteImageIdList.value.contains(id)) {
+            _deleteImageIdList.value.remove(id)
         } else {
-            _images.add(id)
+            _deleteImageIdList.value.add(id)
         }
     }
 
@@ -92,9 +106,9 @@ class BookmarkViewModel @Inject constructor(
     }
 
     fun deleteImages() {
-        if (_images.isNotEmpty()) {
+        if (_deleteImageIdList.value.isNotEmpty()) {
             viewModelScope.launch {
-                val deleteImage = imageRepository.deleteImages(_images)
+                val deleteImage = imageRepository.deleteImages(_deleteImageIdList.value)
 
                 if (deleteImage.isSuccess) {
                     _uiState.update {

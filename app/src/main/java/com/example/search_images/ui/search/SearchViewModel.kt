@@ -52,12 +52,13 @@ class SearchViewModel @Inject constructor(
      */
     fun insertImage(image: NetworkImage) {
         viewModelScope.launch {
-            val insertImage = imageRepository.insertImage(
-                keyword = keyword.value,
-                image = image
-            )
-
-            if (insertImage.isFailure) {
+            try {
+                imageRepository.insertImage(
+                    keyword = keyword.value,
+                    image = image
+                )
+                _userMessage.value = R.string.save_image_message
+            } catch (e: Exception) {
                 _userMessage.value = R.string.error_message
             }
         }

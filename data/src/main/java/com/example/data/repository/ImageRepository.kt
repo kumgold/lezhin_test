@@ -12,7 +12,7 @@ interface ImageRepository {
 
     fun searchImages(keyword: String): Flow<List<LocalImage>>
 
-    suspend fun insertImage(keyword: String, image: NetworkImage): Result<Boolean>
+    suspend fun insertImage(keyword: String, image: NetworkImage)
 
     suspend fun deleteImages(ids: List<String>): Result<Boolean>
 }
@@ -28,13 +28,8 @@ class ImageRepositoryImpl @Inject constructor(
         return imageDao.searchImages(keyword)
     }
 
-    override suspend fun insertImage(keyword: String, image: NetworkImage): Result<Boolean> {
-        return try {
-            imageDao.insert(image.toLocalImage(keyword))
-            Result.success(true)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    override suspend fun insertImage(keyword: String, image: NetworkImage) {
+        imageDao.insert(image.toLocalImage(keyword))
     }
 
     override suspend fun deleteImages(ids: List<String>): Result<Boolean> {

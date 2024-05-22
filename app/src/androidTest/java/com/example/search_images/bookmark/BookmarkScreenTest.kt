@@ -2,6 +2,8 @@ package com.example.search_images.bookmark
 
 import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -61,7 +63,9 @@ class BookmarkScreenTest {
             SearchImagesTheme {
                 Surface {
                     BookmarkScreen(
-                        viewModel = BookmarkViewModel(repository)
+                        viewModel = BookmarkViewModel(repository),
+                        snackBarHostState = remember { SnackbarHostState() },
+                        goToDetailScreen = {}
                     )
                 }
             }

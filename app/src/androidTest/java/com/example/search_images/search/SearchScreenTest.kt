@@ -1,7 +1,9 @@
 package com.example.search_images.search
 
 import androidx.activity.compose.setContent
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -55,7 +57,9 @@ class SearchScreenTest {
             SearchImagesTheme {
                 Surface {
                     SearchScreen(
-                        viewModel = SearchViewModel(searchRepository, imageRepository)
+                        viewModel = SearchViewModel(searchRepository, imageRepository),
+                        snackBarHostState = remember { SnackbarHostState() },
+                        goToDetailScreen = {}
                     )
                 }
             }

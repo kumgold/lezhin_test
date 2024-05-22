@@ -2,7 +2,7 @@ package com.example.data.module
 
 import android.content.Context
 import com.example.data.db.ImageDao
-import com.example.data.db.LezhinDatabase
+import com.example.data.db.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,11 +17,11 @@ class DatabaseModule {
     @Provides
     fun provideLezhinDatabase(
         @ApplicationContext context: Context
-    ): LezhinDatabase = LezhinDatabase.getInstance(context)
+    ): AppDatabase = AppDatabase.getInstance(context)
 
     @Singleton
     @Provides
     fun provideImageDao(
-        database: LezhinDatabase
+        database: AppDatabase
     ): ImageDao = database.imageDao()
 }

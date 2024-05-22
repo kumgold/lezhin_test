@@ -22,13 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.search_images.R
 import com.example.search_images.const.AppScreen
 import com.example.search_images.ui.bookmark.BookmarkScreen
+import com.example.search_images.ui.detail.ImageDetailScreen
 import com.example.search_images.ui.search.SearchScreen
 
 @Composable
@@ -116,12 +119,27 @@ private fun CompactScreen(
         ) {
             composable(AppScreen.Search.route) {
                 SearchScreen(
-                    snackBarHostState = snackBarHostState
+                    snackBarHostState = snackBarHostState,
+                    goToDetailScreen = { imageUrl ->
+                        navController.navigate("${AppScreen.ImageDetail.route}/$imageUrl")
+                    }
                 )
             }
             composable(AppScreen.Bookmark.route) {
                 BookmarkScreen(
-                    snackBarHostState = snackBarHostState
+                    snackBarHostState = snackBarHostState,
+                    goToDetailScreen = { imageUrl ->
+                        navController.navigate("${AppScreen.ImageDetail.route}/$imageUrl")
+                    }
+                )
+            }
+            composable(
+                route = "${AppScreen.ImageDetail.route}/{imageUrl}",
+                arguments = listOf(navArgument("imageUrl") { type = NavType.StringType })
+            ) {
+                ImageDetailScreen(
+                    imageUrl = it.arguments?.getString("imageUrl"),
+                    backToList = { navController.popBackStack() }
                 )
             }
         }
@@ -184,12 +202,27 @@ private fun ExpandedScreen(
             ) {
                 composable(AppScreen.Search.route) {
                     SearchScreen(
-                        snackBarHostState = snackBarHostState
+                        snackBarHostState = snackBarHostState,
+                        goToDetailScreen = { imageUrl ->
+                            navController.navigate("${AppScreen.ImageDetail.route}/$imageUrl")
+                        }
                     )
                 }
                 composable(AppScreen.Bookmark.route) {
                     BookmarkScreen(
-                        snackBarHostState = snackBarHostState
+                        snackBarHostState = snackBarHostState,
+                        goToDetailScreen = { imageUrl ->
+                            navController.navigate("${AppScreen.ImageDetail.route}/$imageUrl")
+                        }
+                    )
+                }
+                composable(
+                    route = "${AppScreen.ImageDetail.route}/{imageUrl}",
+                    arguments = listOf(navArgument("imageUrl") { type = NavType.StringType })
+                ) {
+                    ImageDetailScreen(
+                        imageUrl = it.arguments?.getString("imageUrl"),
+                        backToList = { navController.popBackStack() }
                     )
                 }
             }

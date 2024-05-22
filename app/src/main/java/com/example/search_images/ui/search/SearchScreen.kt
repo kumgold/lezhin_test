@@ -1,28 +1,25 @@
 package com.example.search_images.ui.search
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -35,15 +32,19 @@ import com.example.data.data.NetworkImage
 import com.example.search_images.R
 import com.example.search_images.ui.compose.CircularLoading
 import com.example.search_images.ui.compose.DefaultText
+import com.example.search_images.ui.compose.LazyImageGridView
 import com.example.search_images.ui.compose.SearchTextField
 import com.example.search_images.ui.compose.TitleAppBar
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
+    goToDetailScreen: (String) -> Unit
 ) {
     val items = viewModel.images.collectAsLazyPagingItems()
     val coroutineScope = rememberCoroutineScope()
@@ -57,17 +58,18 @@ fun SearchScreen(
             images = items,
             insertImage = { image -> viewModel.insertImage(image) },
             loadState = items.loadState.refresh,
-            snackBarHostState = snackBarHostState
+            goToDetailScreen = { imageUrl -> goToDetailScreen(imageUrl) }
         )
     }
 
-    val message = viewModel.userMessage.collectAsState()
-    val context = LocalContext.current
-    LaunchedEffect(message.value) {
-        if (message.value != null) {
+    val message by viewModel.userMessage.collectAsState()
+
+    message?.let {
+        val context = LocalContext.current
+        LaunchedEffect(message) {
             coroutineScope.launch {
                 snackBarHostState.showSnackbar(
-                    message = ContextCompat.getString(context, message.value!!),
+                    message = ContextCompat.getString(context, message!!),
                     duration = SnackbarDuration.Short
                 )
             }
@@ -76,15 +78,14 @@ fun SearchScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SearchedImageGridView(
     images: LazyPagingItems<NetworkImage>,
     insertImage: (NetworkImage) -> Unit,
     loadState: LoadState,
-    snackBarHostState: SnackbarHostState
+    goToDetailScreen: (String) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     when (loadState) {
         is LoadState.Loading -> {
             CircularLoading(modifier = Modifier.fillMaxSize())
@@ -96,32 +97,22 @@ private fun SearchedImageGridView(
                     stringRes = R.string.please_search_images
                 )
             } else {
-                val context = LocalContext.current
                 val configuration = LocalConfiguration.current
-                val screenWidth = configuration.screenWidthDp.dp
 
-                LazyVerticalGrid(
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.default_margin_small)),
-                    columns = GridCells.Fixed(2),
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.default_margin_small)),
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.default_margin_small)),
-                    state = rememberLazyGridState(initialFirstVisibleItemScrollOffset = 0)
-                ) {
+                LazyImageGridView {
+                    val screenWidth = configuration.screenWidthDp.dp
+
                     items(images.itemSnapshotList) { image ->
                         AsyncImage(
                             modifier = Modifier
                                 .height(screenWidth / 2)
-                                .clickable {
-                                    coroutineScope.launch {
-                                        snackBarHostState.showSnackbar(
-                                            message = ContextCompat.getString(
-                                                context,
-                                                R.string.save_image_message
-                                            ),
-                                            duration = SnackbarDuration.Short
-                                        )
+                                .combinedClickable(
+                                    onLongClick = {
+                                        image?.let { insertImage(it) }
                                     }
-                                    image?.let { insertImage(it) }
+                                ) {
+                                    val imageUrl = URLEncoder.encode(image?.imageUrl, StandardCharsets.UTF_8.toString())
+                                    goToDetailScreen(imageUrl)
                                 },
                             placeholder = painterResource(id = R.drawable.ic_android_black),
                             error = painterResource(id = R.drawable.ic_launcher_background),

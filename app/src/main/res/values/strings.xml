@@ -4,6 +4,8 @@
     <string name="bookmark">Bookmark</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="image_detail">Image detail</string>
 
     <string name="please_search_images">Please Enter for search images.</string>
     <string name="error_message">Error occurred. Please retry later.</string>

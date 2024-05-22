@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.search_images.R
 import kotlinx.coroutines.delay
 
@@ -74,4 +75,12 @@ fun SearchTextField(
         label = { Text(stringResource(id = R.string.search)) },
         singleLine = true
     )
+}
+
+@Preview
+@Composable
+private fun SearchTextViewPreview() {
+    SearchTextField {
+
+    }
 }
