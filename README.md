@@ -1,7 +1,7 @@
 # Serach images Application
 <p>
-  <img src="./images/image_1.png" height="400" width="250">
-  <img src="./images/image_2.png" height="400" width="250">
+  <img src="./images/image_1.png" width="280">
+  <img src="./images/image_2.png" width="280">
 </p>
 
 <br>
