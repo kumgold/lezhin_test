@@ -1,13 +1,11 @@
 package com.example.search_images.search
 
-import androidx.paging.PagingSource
 import com.example.data.data.NetworkImage
 import com.example.data.repository.ImageRepository
 import com.example.data.repository.SearchRepository
 import com.example.search_images.MainCoroutineRule
 import com.example.search_images.data.FakeImageDao
 import com.example.search_images.data.FakeImageRepository
-import com.example.search_images.data.FakeImagesPagingSource
 import com.example.search_images.data.FakeSearchRepository
 import com.example.search_images.ui.search.SearchViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,25 +50,9 @@ class SearchViewModelTest {
 
     @Test
     fun searchImages() = runTest {
-        val pagingSource = FakeImagesPagingSource(images)
-        val params = PagingSource
-            .LoadParams
-            .Append(
-                key = 1,
-                loadSize = 10,
-                placeholdersEnabled = false
-            )
-        val expected = PagingSource
-            .LoadResult
-            .Page(
-                data = images,
-                prevKey = 0,
-                nextKey = 2
-            )
+        val fakeApiResult = searchRepository.searchImages("test", 1)
 
-        val data = pagingSource.load(params)
-
-        Assert.assertEquals(expected, data)
+        Assert.assertEquals(images, fakeApiResult)
     }
 
     @Test
