@@ -1,7 +1,5 @@
 package com.example.search_images.search
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import com.example.data.data.NetworkImage
 import com.example.data.repository.ImageRepository
