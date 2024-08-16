@@ -12,8 +12,11 @@ class SearchRepositoryImpl @Inject constructor(
     private val searchApiService: KakaoApiService
 ) : SearchRepository {
     override suspend fun searchImages(query: String, page: Int): List<NetworkImage> {
-        val response = searchApiService.searchImages(query, page)
-
-        return response.result
+        try {
+            val response = searchApiService.searchImages(query, page)
+            return response.result
+        } catch (e: Exception) {
+            return emptyList()
+        }
     }
 }

@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -20,7 +21,16 @@ class NetworkModule {
     fun provideKakaoApiService(): KakaoApiService {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.KAKAO_BASE_URL)
-            .client(OkHttpClient.Builder().addInterceptor(KakaoApiInterceptor()).build())
+            .client(
+                OkHttpClient.Builder()
+                    .addInterceptor(KakaoApiInterceptor())
+                    .addInterceptor(
+                        HttpLoggingInterceptor().apply {
+                            level = HttpLoggingInterceptor.Level.BODY
+                        }
+                    )
+                    .build()
+            )
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(KakaoApiService::class.java)
