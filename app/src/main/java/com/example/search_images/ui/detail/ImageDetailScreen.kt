@@ -11,20 +11,25 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.search_images.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageDetailScreen(
-    imageUrl: String? = null,
-    backToList: () -> Unit
+    backToList: () -> Unit,
+    viewModel: ImageDetailViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Column {
         val configuration = LocalConfiguration.current
         val screenWidth = configuration.screenWidthDp.dp
@@ -41,7 +46,7 @@ fun ImageDetailScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(screenWidth),
-            model = imageUrl,
+            model = uiState.imageUrl,
             contentScale = ContentScale.Crop,
             contentDescription = null
         )

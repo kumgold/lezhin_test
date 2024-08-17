@@ -138,7 +138,6 @@ private fun CompactScreen(
                 arguments = listOf(navArgument("imageUrl") { type = NavType.StringType })
             ) {
                 ImageDetailScreen(
-                    imageUrl = it.arguments?.getString("imageUrl"),
                     backToList = { navController.popBackStack() }
                 )
             }
@@ -221,7 +220,6 @@ private fun ExpandedScreen(
                     arguments = listOf(navArgument("imageUrl") { type = NavType.StringType })
                 ) {
                     ImageDetailScreen(
-                        imageUrl = it.arguments?.getString("imageUrl"),
                         backToList = { navController.popBackStack() }
                     )
                 }
