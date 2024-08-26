@@ -1,13 +1,11 @@
 package com.example.search_images.ui.bookmark
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Checkbox
@@ -19,12 +17,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,7 +29,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.data.db.LocalImage
 import com.example.search_images.R
-import com.example.search_images.ui.compose.CircularLoading
 import com.example.search_images.ui.compose.DefaultText
 import com.example.search_images.ui.compose.EditImagesAppBar
 import com.example.search_images.ui.compose.LazyImageGridView
@@ -64,7 +60,6 @@ fun BookmarkScreen(
             images = uiState.result,
             isEditMode = uiState.isEditMode,
             deleteImages = { id -> viewModel.updateDeleteImages(id) },
-            isLoading = uiState.isLoading,
             goToDetailScreen = { imageUrl -> goToDetailScreen(imageUrl) },
             updateEditMode = { viewModel.updateEditMode() }
         )
@@ -106,47 +101,33 @@ private fun SavedImageGridView(
     images: List<LocalImage>,
     isEditMode: Boolean,
     deleteImages: (String) -> Unit,
-    isLoading: Boolean,
     goToDetailScreen: (String) -> Unit,
     updateEditMode: () -> Unit
 ) {
-    when (isLoading) {
-        true -> {
-            CircularLoading(modifier = Modifier.fillMaxSize())
-        }
-        false -> {
-            if (images.isEmpty()) {
-                DefaultText(
-                    modifier = Modifier.fillMaxWidth(),
-                    stringRes = R.string.save_your_images
+    if (images.isNotEmpty()) {
+        LazyImageGridView {
+            items(images) { image ->
+                SavedImageItem(
+                    imageUrl = image.imageUrl,
+                    imageId = image.id,
+                    isEditMode = isEditMode,
+                    deleteImages = { id -> deleteImages(id) },
+                    goToDetailScreen = { imageUrl -> goToDetailScreen(imageUrl) },
+                    updateEditMode = { updateEditMode() }
                 )
-            } else {
-                val configuration = LocalConfiguration.current
-
-                LazyImageGridView {
-                    val screenWidth = configuration.screenWidthDp.dp
-
-                    items(images) { image ->
-                        SavedImageItem(
-                            imageHeight = screenWidth/2,
-                            imageUrl = image.imageUrl,
-                            imageId = image.id,
-                            isEditMode = isEditMode,
-                            deleteImages = { id -> deleteImages(id) },
-                            goToDetailScreen = { imageUrl -> goToDetailScreen(imageUrl) },
-                            updateEditMode = { updateEditMode() }
-                        )
-                    }
-                }
             }
         }
+    } else {
+        DefaultText(
+            modifier = Modifier.fillMaxWidth(),
+            stringRes = R.string.save_your_images
+        )
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SavedImageItem(
-    imageHeight: Dp,
     imageUrl: String,
     imageId: String,
     isEditMode: Boolean,
@@ -156,7 +137,8 @@ private fun SavedImageItem(
 ) {
     Box {
         AsyncImage(
-            modifier = Modifier.height(imageHeight)
+            modifier = Modifier
+                .aspectRatio(1.0f)
                 .combinedClickable(
                     onLongClick = {
                         updateEditMode()
@@ -178,7 +160,8 @@ private fun SavedImageItem(
             val isChecked = rememberSaveable { mutableStateOf(false) }
 
             Checkbox(
-                modifier = Modifier.padding(2.dp),
+                modifier = Modifier.padding(2.dp)
+                    .align(Alignment.TopEnd),
                 checked = isChecked.value,
                 onCheckedChange = {
                     isChecked.value = !isChecked.value

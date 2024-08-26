@@ -1,6 +1,7 @@
 package com.example.search_images.ui.compose
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -42,30 +43,35 @@ fun EditImagesAppBar(
             Text(text = stringResource(id = titleRes))
         },
         actions = {
-            if (isEditMode) {
-                Row {
-                    TextButton(
-                        onClick = {
-                            deleteImages()
+            AnimatedContent(
+                targetState = isEditMode,
+                label = ""
+            ) { editModeState ->
+                if (editModeState) {
+                    Row {
+                        TextButton(
+                            onClick = {
+                                deleteImages()
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.delete))
                         }
-                    ) {
-                        Text(stringResource(id = R.string.delete))
+                        TextButton(
+                            onClick = {
+                                updateEditMode()
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.cancel))
+                        }
                     }
+                } else {
                     TextButton(
                         onClick = {
                             updateEditMode()
                         }
                     ) {
-                        Text(stringResource(id = R.string.cancel))
+                        Text(stringResource(id = R.string.edit))
                     }
-                }
-            } else {
-                TextButton(
-                    onClick = {
-                        updateEditMode()
-                    }
-                ) {
-                    Text(stringResource(id = R.string.edit))
                 }
             }
         }
