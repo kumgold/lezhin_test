@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import com.example.search_images.ui.main.MainScreen
 import com.example.search_images.ui.theme.SearchImagesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,7 +17,7 @@ class MainActivity : ComponentActivity() {
             val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
 
             SearchImagesTheme {
-                MainScreen(widthSizeClass)
+                App(widthSizeClass)
             }
         }
     }
