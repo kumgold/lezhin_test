@@ -1,6 +1,7 @@
 package com.example.search_images.ui.search
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -30,6 +33,7 @@ import com.example.search_images.ui.compose.DefaultText
 import com.example.search_images.ui.compose.LazyImageGridView
 import com.example.search_images.ui.compose.SearchTextField
 import com.example.search_images.ui.compose.TitleAppBar
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -80,11 +84,14 @@ private fun SearchedImageGridView(
     searchImages: (String) -> Unit,
     keyword: String,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     if (images.isNotEmpty()) {
         LazyImageGridView {
             items(images) { image ->
                 ImageItem(
                     image = image,
+                    coroutineScope = coroutineScope,
                     insertImage = insertImage,
                     goToDetailScreen = goToDetailScreen
                 )
@@ -111,6 +118,7 @@ private fun SearchedImageGridView(
 @Composable
 private fun ImageItem(
     image: NetworkImage,
+    coroutineScope: CoroutineScope,
     insertImage: (NetworkImage) -> Unit,
     goToDetailScreen: (String) -> Unit,
 ) {
