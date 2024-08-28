@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
@@ -45,7 +46,9 @@ fun BookmarkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
         EditImagesAppBar(
             titleRes = R.string.bookmark,
             updateEditMode = { viewModel.updateEditMode() },
